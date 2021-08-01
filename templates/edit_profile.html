@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--  This file has been downloaded from bootdey.com @bootdey on twitter -->
+    <!--  All snippets are MIT license http://bootdey.com/license -->
+    <title>Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/settings/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center mt-3">
+        <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+            <h2 class="h3 mb-4 page-title">Edit</h2>
+            <div class="my-4">
+                <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab"
+                           aria-controls="home" aria-selected="false">Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="social-tab" data-toggle="tab" href="#social" role="tab"
+                           aria-controls="home" aria-selected="false">Social</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="privacy-tab" data-toggle="tab" href="#privacy" role="tab"
+                           aria-controls="home" aria-selected="false">Privacy</a>
+                    </li>
+                </ul>
+                <form id="profileForm">
+                    <section id="info">
+                        <div id="profileError" class="text-danger mb-3"></div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="firstname">Firstname</label>
+                                <input type="text" name="firstname" id="firstname" class="form-control"
+                                       value="{% if user.complete == True %}{{ user.fname }}{% endif %}"
+                                       placeholder="Enter firstname"/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="lastname">Lastname</label>
+                                <input type="text" name="lastname" id="lastname" class="form-control"
+                                       value="{% if user.complete == True %}{{ user.lname }}{% endif %}"
+                                       placeholder="Enter lastname"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input readonly type="email" class="form-control" id="email" value="{{ user.email }}"
+                                   placeholder="Enter your email" name="email"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control" id="address" name="address"
+                                   value="{% if user.complete == True %}{{ user.address }}{% endif %}"
+                                   placeholder="Enter your address"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="about">About</label>
+                            <textarea class="form-control" placeholder="Tell few words about you."
+                                      id="about" name="about" rows="5">{% if user.complete == True %}{{ user.about }}{% endif %}</textarea>
+                        </div>
+                        <button type="submit" id="saveProfile" class="btn btn-primary">Save Changes</button>
+                    </section>
+                    <section id="social">
+                        <div id="socialError" class="text-danger mb-3"></div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="twitter">Twitter</label>
+                                <input type="text" name="twitter" id="twitter" class="form-control"
+                                       value="{% if user.twitter != None %}{{ user.twitter }}{% endif %}"
+                                       placeholder="Enter twitter url"/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="insta">Instagram</label>
+                                <input type="text" name="insta" id="insta" class="form-control"
+                                       value="{% if user.insta != None %}{{ user.insta }}{% endif %}"
+                                       placeholder="Enter insta url"/>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="github">Github</label>
+                                <input type="text" name="github" id="github" class="form-control"
+                                       value="{% if user.github != None %}{{ user.github }}{% endif %}"
+                                       placeholder="Enter github url"/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="website">Website</label>
+                                <input type="text" name="website" id="website" class="form-control"
+                                       value="{% if user.website != None %}{{ user.website }}{% endif %}"
+                                       placeholder="Enter your website"/>
+                            </div>
+                        </div>
+                        <button type="submit" id="saveSocial" class="btn btn-primary">Save Changes</button>
+                    </section>
+                    <section id="privacy">
+                        <div id="privacyError" class="text-danger mb-3"></div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="oldPass">Old Password</label>
+                                    <input type="password" name="oldPass" class="form-control" id="oldPass"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newPass">New Password</label>
+                                    <input type="password" name="newPass" class="form-control" id="newPass"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmPass">Confirm Password</label>
+                                    <input type="password" name="confirmPass" class="form-control" id="confirmPass"/>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" id="updatePassword" class="btn btn-primary">Save Changes</button>
+                    </section>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script src="/static/settings/script.js"></script>
+</body>
+</html>

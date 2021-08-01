@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <!--  This file has been downloaded from bootdey.com @bootdey on twitter -->
-    <!--  All snippets are MIT license http://bootdey.com/license -->
-    <title>Profile</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>Settings</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/favicon.ico"/>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/settings/style.css" rel="stylesheet">
@@ -13,109 +12,60 @@
 </head>
 <body>
 <div class="container">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-3">
         <div class="col-12 col-lg-10 col-xl-8 mx-auto">
-            <h2 class="h3 mb-4 page-title">Settings</h2>
             <div class="my-4">
                 <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab"
-                           aria-controls="home" aria-selected="false">Profile</a>
+                        <a class="nav-link active" id="view-tab" data-toggle="tab" href="#view" role="tab"
+                           aria-controls="view" aria-selected="false">View</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="edit-tab" data-toggle="tab" href="#edit" role="tab"
+                           aria-controls="edit" aria-selected="false">Edit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="delete-tab" data-toggle="tab" href="#delete" role="tab"
+                           aria-controls="delete" aria-selected="false">Delete</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout-tab" data-toggle="tab" href="#logout" role="tab"
+                           aria-controls="logout" aria-selected="false">Logout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="home-tab" data-toggle="tab" href="#home" role="tab"
+                           aria-controls="home" aria-selected="false">Home</a>
                     </li>
                 </ul>
-                <form id="profileForm">
-                    <div class="row mt-5 align-items-center">
-                        <div class="col-md-3 text-center mb-5">
-                            <div class="avatar avatar-xl">
-                                <img src="/static/assets/avatar.png" draggable="false" alt="..."
-                                     class="avatar-img rounded-circle"/>
+                <div class="row mt-5 align-items-center">
+                    <div class="col-md-3 text-center mb-5">
+                        <div class="avatar avatar-xl">
+                            <img src="/static/assets/avatar.png" draggable="false" alt="..."
+                                 class="avatar-img rounded-circle"/>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row align-items-center">
+                            <div class="col-md-7">
+                                <h4 class="mb-1">{{ user.fname }} {{ user.lname }}</h4>
+                                <p class="small mb-3"><span class="badge badge-dark">{{ user.email }}</span></p>
                             </div>
                         </div>
-                        <div class="col">
-                            <div class="row align-items-center">
-                                <div class="col-md-7">
-                                    {% if user.complete == False %}
-                                    <h4 class="mb-1">Not Found</h4>
-                                    {% else %}
-                                    <h4 class="mb-1">{{ user.fname }} {{ user.lname }}</h4>
-                                    {% endif %}
-                                    <p class="small mb-3"><span class="badge badge-dark">{{ user.email }}</span></p>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-md-7">
-                                    {% if user.complete == False %}
-                                    <p class="text-muted">Add some words about yourself.</p>
-                                    {% else %}
-                                    <p class="text-muted">{{ user.about }}</p>
-                                    {% endif %}
-                                </div>
+                        <div class="row mb-4">
+                            <div class="col-md-7">
+                                <p class="text-muted">{{ user.about }}</p>
                             </div>
                         </div>
                     </div>
-                    <hr class="my-4"/>
-                    <div id="profileError" class="text-danger mb-3"></div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="firstname">Firstname</label>
-                            <input type="text" name="firstname" id="firstname" class="form-control"
-                                   value="{% if user.complete == True %}{{ user.fname }}{% endif %}"
-                                   placeholder="Enter firstname"/>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="lastname">Lastname</label>
-                            <input type="text" name="lastname" id="lastname" class="form-control"
-                                   value="{% if user.complete == True %}{{ user.lname }}{% endif %}"
-                                   placeholder="Enter lastname"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input readonly type="email" class="form-control" id="email" value="{{ user.email }}"
-                               placeholder="Enter your email" name="email"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="address">Address</label>
-                        <input type="text" class="form-control" id="address" name="address"
-                               value="{% if user.complete == True %}{{ user.address }}{% endif %}"
-                               placeholder="Enter your address"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="about">About</label>
-                        <textarea class="form-control" placeholder="Tell few words about you."
-                                  id="about" name="about" rows="5">{% if user.complete == True %}
-                            {{ user.about }}
-                            {% endif %}</textarea>
-                    </div>
-                    <button type="submit" id="saveProfile" class="btn btn-primary">Save Change</button>
-                    <hr class="my-4"/>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="oldPass">Old Password</label>
-                                <input type="password" name="oldPass" class="form-control" id="oldPass"/>
-                            </div>
-                            <div class="form-group">
-                                <label for="newPass">New Password</label>
-                                <input type="password" name="newPass" class="form-control" id="newPass"/>
-                            </div>
-                            <div class="form-group">
-                                <label for="confirmPass">Confirm Password</label>
-                                <input type="password" name="confirmPass" class="form-control" id="confirmPass"/>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" id="updatePassword" class="btn btn-primary">Update Password</button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-<script src="/static/settings/script.js"></script>
+<script src="/static/settings/setting.js"></script>
 </body>
 </html>

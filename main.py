@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, jsonify, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 import json
+import datetime
 
 # Loading variable config json
 with open("config.json") as f:
@@ -30,8 +31,13 @@ class Users(db.Model):
     address = db.Column(db.String(60), nullable=True)
     about = db.Column(db.String(200), nullable=True)
     complete = db.Column(db.Boolean(), nullable=False)
+    twitter = db.Column(db.String(50), nullable=True)
+    insta = db.Column(db.String(50), nullable=True)
+    github = db.Column(db.String(50), nullable=True)
+    website = db.Column(db.String(50), nullable=True)
 
-    def __init__(self, email, password, fname=None, lname=None, address=None, about=None, complete=False):
+    def __init__(self, email, password, fname=None, lname=None, address=None, about=None, complete=False,
+                 twitter=None, insta=None, github=None, website=None):
         self.email = email
         self.password = password
         self.fname = fname
@@ -39,6 +45,30 @@ class Users(db.Model):
         self.address = address
         self.about = about
         self.complete = complete
+        self.twitter = twitter
+        self.insta = insta
+        self.github = github
+        self.website = website
+
+
+# Posts Table
+class Posts(db.Model):
+    __tablename__ = "posts"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(30), nullable=False)
+    subtitle = db.Column(db.String(30), nullable=False)
+    description = db.Column(db.String(50), nullable=False)
+    content = db.Column(db.String(500), nullable=False)
+    time_upload = db.Column(db.DateTime(30), nullable=False)
+
+    def __init__(self, email, title, subtitle, description, content):
+        self.email = email
+        self.title = title
+        self.subtitle = subtitle
+        self.description = description
+        self.content = content
+        self.time_upload = datetime.datetime.now()
 
 
 # Owner Region (used to send otp by website owner's email)
@@ -48,7 +78,6 @@ password_ = db.session.query(Users).filter(Users.email == data["params"]["owner_
 
 @app.route('/')
 def home():
-    # session.pop("user")
     if 'user' in session:
         # If already logged in
         user = db.session.query(Users).filter(Users.email == session["user"]).first()
@@ -56,7 +85,7 @@ def home():
         if user.complete:
             return redirect('/about')
         else:
-            return redirect("/settings")
+            return redirect("/edit")
     else:
         # If not logged in
         return render_template("login.html")
@@ -175,6 +204,32 @@ def forgot_user():
             return jsonify(error="Not Registered")
 
 
+@app.route('/logout_user', methods=["POST"])
+def logout_user():
+    # Logging out
+    if request.method == "POST":
+        if "user" in session:
+            session.pop("user")
+            return jsonify(error=None)
+        else:
+            return jsonify(error="Logged out already")
+
+
+@app.route('/delete_user', methods=["POST"])
+def delete_user():
+    # Deleting user
+    if request.method == "POST":
+        if "user" in session:
+            # Finding user by email
+            user = db.session.query(Users).filter(Users.email == session["user"]).first()
+            db.session.delete(user)
+            db.session.commit()
+            session.pop("user")
+            return jsonify(error=None)
+        else:
+            return jsonify(error="Logged out")
+
+
 @app.route('/send_otp', methods=["POST"])
 def send_otp():
     # Sending otp
@@ -218,22 +273,109 @@ def update_profile():
             return jsonify(error="Incorrect Email")
 
 
-@app.route('/settings')
-def settings():
-    if "user" in session:
-        user = db.session.query(Users).filter(Users.email == session["user"]).first()
-        return render_template("settings.html", user=user)
-    else:
-        redirect('/')
+def formatLinks(link):
+    if link == "":
+        return None
+    return link
+
+
+@app.route('/update_social', methods=["POST"])
+def update_social():
+    # Update Social Links of User
+    if request.method == "POST":
+        # Getting values from form & formatting it
+        email__ = request.form["email"]
+        twitter__ = formatLinks(request.form["twitter"])
+        insta__ = formatLinks(request.form["insta"])
+        github__ = formatLinks(request.form["github"])
+        website__ = formatLinks(request.form["website"])
+
+        # Finding user by email
+        user = db.session.query(Users).filter(Users.email == email__)
+
+        if user.first().complete:
+            if "user" in session:
+                # Checking for correct user
+                if session["user"] == email__:
+                    user.update({
+                        Users.twitter: twitter__,
+                        Users.insta: insta__,
+                        Users.github: github__,
+                        Users.website: website__
+                    })
+                    db.session.commit()
+                    return jsonify(error=None)
+                else:
+                    return jsonify(error="Incorrect Email")
+            else:
+                return jsonify(error="Login First")
+        else:
+            return jsonify(error="Complete info first")
+
+
+@app.route('/update_password', methods=["POST"])
+def update_password():
+    # Update Password of User
+    if request.method == "POST":
+        # Getting values from form & formatting it
+        email__ = request.form["email"]
+        old_pass__ = formatLinks(request.form["oldPass"])
+        new_pass__ = formatLinks(request.form["newPass"])
+
+        # Finding user by email
+        user = db.session.query(Users).filter(Users.email == email__)
+
+        if user.first().complete:
+            if "user" in session:
+                # Checking for correct user
+                if session["user"] == email__:
+                    if user.first().password == old_pass__:
+                        user.update({
+                            Users.password: new_pass__
+                        })
+                        db.session.commit()
+                        return jsonify(error=None)
+                    else:
+                        return jsonify(error="Incorrect Password")
+                else:
+                    return jsonify(error="Incorrect Email")
+            else:
+                return jsonify(error="Login First")
+        else:
+            return jsonify(error="Complete info first")
 
 
 @app.route('/about')
 def about():
     if "user" in session:
         user = db.session.query(Users).filter(Users.email == session["user"]).first()
-        return render_template("about.html", user=user, params=data["params"])
+        if user.complete:
+            return render_template("about.html", user=user, params=data["params"])
+        else:
+            return redirect('/')
     else:
-        redirect('/')
+        return redirect('/')
+
+
+@app.route('/settings')
+def settings():
+    if "user" in session:
+        user = db.session.query(Users).filter(Users.email == session["user"]).first()
+        if user.complete:
+            return render_template("settings.html", user=user)
+        else:
+            return redirect('/')
+    else:
+        return redirect('/')
+
+
+@app.route('/edit')
+def edit():
+    if "user" in session:
+        user = db.session.query(Users).filter(Users.email == session["user"]).first()
+        return render_template("edit_profile.html", user=user)
+    else:
+        return redirect('/')
 
 
 if __name__ == '__main__':
