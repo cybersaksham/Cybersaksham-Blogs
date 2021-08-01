@@ -19,28 +19,44 @@ else:
 db = SQLAlchemy(app)
 
 
-# Admins Table
-class Admins(db.Model):
-    __tablename__ = "admins"
+# Users Table
+class Users(db.Model):
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(30), nullable=False)
+    fname = db.Column(db.String(20), nullable=True)
+    lname = db.Column(db.String(20), nullable=True)
+    address = db.Column(db.String(60), nullable=True)
+    about = db.Column(db.String(200), nullable=True)
+    complete = db.Column(db.Boolean(), nullable=False)
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, fname=None, lname=None, address=None, about=None, complete=False):
         self.email = email
         self.password = password
+        self.fname = fname
+        self.lname = lname
+        self.address = address
+        self.about = about
+        self.complete = complete
 
 
 # Owner Region (used to send otp by website owner's email)
-email_ = db.session.query(Admins).filter(Admins.email == data["params"]["owner_email"]).first().email
-password_ = db.session.query(Admins).filter(Admins.email == data["params"]["owner_email"]).first().password
+email_ = db.session.query(Users).filter(Users.email == data["params"]["owner_email"]).first().email
+password_ = db.session.query(Users).filter(Users.email == data["params"]["owner_email"]).first().password
 
 
 @app.route('/')
 def home():
+    # session.pop("user")
     if 'user' in session:
         # If already logged in
-        return render_template("index.html")
+        user = db.session.query(Users).filter(Users.email == session["user"]).first()
+        # Checking if profile of user is complete
+        if user.complete:
+            return redirect('/about')
+        else:
+            return redirect("/settings")
     else:
         # If not logged in
         return render_template("login.html")
@@ -60,7 +76,7 @@ def login_user():
         password = request.form["password"]
 
         # Finding user by email
-        user = db.session.query(Admins).filter(Admins.email == email).first()
+        user = db.session.query(Users).filter(Users.email == email).first()
 
         if user is not None:
             # If user is present in database
@@ -91,24 +107,28 @@ def register_user():
 
         if "otp" in session and "email_otp" in session:
             # If otp is present
-            if int(session["otp"]) == int(otp) and session["email_otp"] == email:
-                # If otp is correct
-                try:
-                    # Try to add user in database
-                    admin = Admins(email, password)
-                    db.session.add(admin)
-                    db.session.commit()
-                    add_user(email)
-                    return jsonify(error=None)
-                except:
-                    # If user is already present
-                    return jsonify(error="Already Registered")
-                finally:
-                    # In both cases clearing otp
-                    session.pop("otp")
-                    session.pop("email_otp")
-            else:
-                # If otp is incorrect
+            try:
+                if int(session["otp"]) == int(otp) and session["email_otp"] == email:
+                    # If otp is correct
+                    try:
+                        # Try to add user in database
+                        admin = Users(email, password)
+                        db.session.add(admin)
+                        db.session.commit()
+                        add_user(email)
+                        return jsonify(error=None)
+                    except Exception as e:
+                        # If user is already present
+                        # return jsonify(error="Already Registered")
+                        return jsonify(error=e)
+                    finally:
+                        # In both cases clearing otp
+                        session.pop("otp")
+                        session.pop("email_otp")
+                else:
+                    # If otp is incorrect
+                    return jsonify(error="Incorrect OTP")
+            except:
                 return jsonify(error="Incorrect OTP")
         else:
             # If otp is not present then request it
@@ -125,24 +145,27 @@ def forgot_user():
         otp = request.form["otp"]
 
         # Finding user by email
-        user = db.session.query(Admins).filter(Admins.email == email).first()
+        user = db.session.query(Users).filter(Users.email == email).first()
 
         if user is not None:
             # If user is found in database
             if "otp" in session and "email_otp" in session:
                 # If otp is present in session storage
-                if int(session["otp"]) == int(otp) and email == session["email_otp"]:
-                    # If otp is correct
-                    # Updating Password
-                    db.session.query(Admins).filter(Admins.email == email).update({Admins.password: password})
-                    db.session.commit()
-                    add_user(email)
-                    # Clearing otp
-                    session.pop("otp")
-                    session.pop("email_otp")
-                    return jsonify(error=None)
-                else:
-                    # If otp is incorrect
+                try:
+                    if int(session["otp"]) == int(otp) and email == session["email_otp"]:
+                        # If otp is correct
+                        # Updating Password
+                        db.session.query(Users).filter(Users.email == email).update({Users.password: password})
+                        db.session.commit()
+                        add_user(email)
+                        # Clearing otp
+                        session.pop("otp")
+                        session.pop("email_otp")
+                        return jsonify(error=None)
+                    else:
+                        # If otp is incorrect
+                        return jsonify(error="Incorrect OTP")
+                except:
                     return jsonify(error="Incorrect OTP")
             else:
                 # If otp is not present then request it
@@ -164,6 +187,53 @@ def send_otp():
     session["otp"] = response.json()["otp"]
     session["email_otp"] = email
     return jsonify(response=response.json())
+
+
+@app.route('/update_profile', methods=["POST"])
+def update_profile():
+    # Update Profile of User
+    if request.method == "POST":
+        # Getting values from form
+        firstname__ = request.form["firstname"]
+        lastname__ = request.form["lastname"]
+        email__ = request.form["email"]
+        address__ = request.form["address"]
+        about__ = request.form["about"]
+
+        # Finding user by email
+        user = db.session.query(Users).filter(Users.email == email__)
+
+        # Checking for correct user
+        if session["user"] == email__:
+            user.update({
+                Users.fname: firstname__,
+                Users.lname: lastname__,
+                Users.address: address__,
+                Users.about: about__,
+                Users.complete: True
+            })
+            db.session.commit()
+            return jsonify(error=None)
+        else:
+            return jsonify(error="Incorrect Email")
+
+
+@app.route('/settings')
+def settings():
+    if "user" in session:
+        user = db.session.query(Users).filter(Users.email == session["user"]).first()
+        return render_template("settings.html", user=user)
+    else:
+        redirect('/')
+
+
+@app.route('/about')
+def about():
+    if "user" in session:
+        user = db.session.query(Users).filter(Users.email == session["user"]).first()
+        return render_template("about.html", user=user, params=data["params"])
+    else:
+        redirect('/')
 
 
 if __name__ == '__main__':

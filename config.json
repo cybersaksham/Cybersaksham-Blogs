@@ -4,6 +4,9 @@
     "debug": true,
     "local_database_uri": "postgresql://postgres:postgres123@localhost/blog-template",
     "production_database_uri": "",
-    "owner_email": "help.saksham.python@gmail.com"
+    "owner_email": "help.saksham.python@gmail.com",
+    "copyright": "cybersaksham",
+    "owner_url": "https://cybersaksham.herokuapp.com/",
+    "build_year": 2021
   }
 }

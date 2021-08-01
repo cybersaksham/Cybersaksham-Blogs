@@ -27,5 +27,4 @@ These python packages are used to made this website (also stored in requirements
 </ul>
 
 # Status
-<p>Till now only login page is added so link of website is not available.</p>
-<p>Will be updated regularly.</p>
+<p>Login page added and after login about page opens up.</p>
