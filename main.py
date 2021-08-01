@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 import datetime
 
-# Loading variable config json
+# Loading variable configurations
 with open("config.json") as f:
     data = json.load(f)
 
