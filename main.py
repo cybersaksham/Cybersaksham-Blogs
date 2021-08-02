@@ -398,13 +398,20 @@ def posts():
 def post(post_id):
     post__ = db.session.query(Posts).filter(Posts.id == post_id).first()
     user = db.session.query(Users).filter(Users.email == post__.email).first()
+    posts__ = db.session.query(Posts).filter(Posts.email == post__.email).all()
+    cur_ind = posts__.index(post__)
+    prev_post__ = None if cur_ind == 0 else posts__[cur_ind - 1]
+    next_post__ = None if cur_ind == len(posts__) - 1 else posts__[cur_ind + 1]
     if "user" in session:
         if post__.email == session["user"]:
-            return render_template("post.html", admin=user, user=user, params=data["params"], post=post__)
+            return render_template("post.html", admin=user, user=user, params=data["params"],
+                                   post=post__, prevPost=prev_post__, nextPost=next_post__)
         else:
-            return render_template("post.html", admin=None, user=user, params=data["params"], post=post__)
+            return render_template("post.html", admin=None, user=user, params=data["params"],
+                                   post=post__, prevPost=prev_post__, nextPost=next_post__)
     else:
-        return render_template("post.html", admin=None, user=user, params=data["params"], post=post__)
+        return render_template("post.html", admin=None, user=user, params=data["params"],
+                               post=post__, prevPost=prev_post__, nextPost=next_post__)
 
 
 @app.route('/add')

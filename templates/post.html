@@ -34,4 +34,17 @@
         </div>
     </div>
 </article>
+<div class="container my-2"
+     style="display: flex; align-items: center; justify-content: space-around;">
+    {% if prevPost == None %}
+    <a style="pointer-events: none" href="javascript:void(0)" class="btn btn-secondary">Prev</a>
+    {% else %}
+    <a href="/post/{{ prevPost.id | safe }}" class="btn btn-primary">Prev</a>
+    {% endif %}
+    {% if nextPost == None %}
+    <a style="pointer-events: none" href="javascript:void(0)" class="btn btn-secondary">Next</a>
+    {% else %}
+    <a href="/post/{{ nextPost.id | safe }}" class="btn btn-primary">Next</a>
+    {% endif %}
+</div>
 {% endblock %}
