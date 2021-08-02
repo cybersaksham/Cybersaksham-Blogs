@@ -394,6 +394,19 @@ def posts():
         return redirect('/')
 
 
+@app.route('/post/<int:post_id>')
+def post(post_id):
+    post__ = db.session.query(Posts).filter(Posts.id == post_id).first()
+    user = db.session.query(Users).filter(Users.email == post__.email).first()
+    if "user" in session:
+        if post__.email == session["user"]:
+            return render_template("post.html", admin=user, user=user, params=data["params"], post=post__)
+        else:
+            return render_template("post.html", admin=None, user=user, params=data["params"], post=post__)
+    else:
+        return render_template("post.html", admin=None, user=user, params=data["params"], post=post__)
+
+
 @app.route('/add')
 def add():
     if "user" in session:
