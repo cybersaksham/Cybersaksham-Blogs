@@ -357,6 +357,20 @@ def about():
         return redirect('/')
 
 
+@app.route('/posts')
+def posts():
+    a = datetime.datetime.today().strftime("%b %d, %Y")
+    if "user" in session:
+        user = db.session.query(Users).filter(Users.email == session["user"]).first()
+        if user.complete:
+            posts__ = db.session.query(Posts).filter(Posts.email == session["user"]).all()
+            return render_template("posts.html", user=user, params=data["params"], posts=posts__)
+        else:
+            return redirect('/')
+    else:
+        return redirect('/')
+
+
 @app.route('/settings')
 def settings():
     if "user" in session:

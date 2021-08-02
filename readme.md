@@ -27,4 +27,4 @@ These python packages are used to made this website (also stored in requirements
 </ul>
 
 # Status
-<p>Admin functionality completed.Only blogs functionality left.</p>
+<p>Admin functionality completed. Only blogs functionality left.</p>

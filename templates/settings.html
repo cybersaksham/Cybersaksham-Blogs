@@ -37,27 +37,91 @@
                            aria-controls="home" aria-selected="false">Home</a>
                     </li>
                 </ul>
-                <div class="row mt-5 align-items-center">
-                    <div class="col-md-3 text-center mb-5">
-                        <div class="avatar avatar-xl">
-                            <img src="/static/assets/avatar.png" draggable="false" alt="..."
-                                 class="avatar-img rounded-circle"/>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="row align-items-center">
-                            <div class="col-md-7">
-                                <h4 class="mb-1">{{ user.fname }} {{ user.lname }}</h4>
-                                <p class="small mb-3"><span class="badge badge-dark">{{ user.email }}</span></p>
+                <form id="profileForm">
+                    <div class="row mt-5 align-items-center">
+                        <div class="col-md-3 text-center mb-5">
+                            <div class="avatar avatar-xl">
+                                <img src="/static/assets/avatar.png" draggable="false" alt="..."
+                                     class="avatar-img rounded-circle"/>
                             </div>
                         </div>
-                        <div class="row mb-4">
-                            <div class="col-md-7">
-                                <p class="text-muted">{{ user.about }}</p>
+                        <div class="col">
+                            <div class="row align-items-center">
+                                <div class="col-md-7">
+                                    <h4 class="mb-1">{{ user.fname }} {{ user.lname }}</h4>
+                                    <p class="small mb-3"><span class="badge badge-dark">{{ user.email }}</span></p>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-md-7">
+                                    <p class="text-muted">{{ user.about }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <section id="info">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="firstname">Firstname</label>
+                                <input type="text" name="firstname" id="firstname" class="form-control"
+                                       value="{% if user.complete == True %}{{ user.fname }}{% endif %}"
+                                       placeholder="Enter firstname" readonly/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="lastname">Lastname</label>
+                                <input type="text" name="lastname" id="lastname" class="form-control"
+                                       value="{% if user.complete == True %}{{ user.lname }}{% endif %}"
+                                       placeholder="Enter lastname" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input readonly type="email" class="form-control" id="email" value="{{ user.email }}"
+                                   placeholder="Enter your email" name="email"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control" id="address" name="address"
+                                   value="{% if user.complete == True %}{{ user.address }}{% endif %}"
+                                   placeholder="Enter your address" readonly/>
+                        </div>
+                        <div class="form-group">
+                            <label for="about">About</label>
+                            <textarea readonly class="form-control" placeholder="Tell few words about you."
+                                      id="about" name="about" rows="5">{% if user.complete == True %}{{ user.about }}{% endif %}</textarea>
+                        </div>
+                    </section>
+                    <section id="social">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="twitter">Twitter</label>
+                                <input type="text" name="twitter" id="twitter" class="form-control"
+                                       value="{% if user.twitter != None %}{{ user.twitter }}{% endif %}"
+                                       placeholder="Enter twitter url" readonly/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="insta">Instagram</label>
+                                <input type="text" name="insta" id="insta" class="form-control"
+                                       value="{% if user.insta != None %}{{ user.insta }}{% endif %}"
+                                       placeholder="Enter insta url" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="github">Github</label>
+                                <input type="text" name="github" id="github" class="form-control"
+                                       value="{% if user.github != None %}{{ user.github }}{% endif %}"
+                                       placeholder="Enter github url" readonly/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="website">Website</label>
+                                <input type="text" name="website" id="website" class="form-control"
+                                       value="{% if user.website != None %}{{ user.website }}{% endif %}"
+                                       placeholder="Enter your website" readonly/>
+                            </div>
+                        </div>
+                    </section>
+                </form>
             </div>
         </div>
     </div>
