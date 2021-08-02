@@ -58,17 +58,19 @@ class Posts(db.Model):
     email = db.Column(db.String(50), nullable=False)
     title = db.Column(db.String(30), nullable=False)
     subtitle = db.Column(db.String(30), nullable=False)
-    description = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(100), nullable=False)
     content = db.Column(db.String(500), nullable=False)
     time_upload = db.Column(db.String(15), nullable=False)
+    updated = db.Column(db.Boolean(), nullable=False)
 
-    def __init__(self, email, title, subtitle, description, content):
+    def __init__(self, email, title, subtitle, description, content, updated=False):
         self.email = email
         self.title = title
         self.subtitle = subtitle
         self.description = description
         self.content = content
         self.time_upload = datetime.datetime.today().strftime("%b %d, %Y")
+        self.updated = updated
 
 
 # Owner Region (used to send otp by website owner's email)
@@ -344,6 +346,23 @@ def update_password():
             return jsonify(error="Complete info first")
 
 
+@app.route('/delete_post', methods=["POST"])
+def delete_post():
+    # Deleting post
+    if request.method == "POST":
+        if "user" in session:
+            # Finding user by email
+            user = db.session.query(Users).filter(Users.email == session["user"]).first()
+            post_url = int(request.args.get('url').split('/')[-1])
+            post__ = db.session.query(Posts).filter(Posts.id == post_url).first()
+            if post__.email == session["user"]:
+                db.session.delete(post__)
+                db.session.commit()
+                return jsonify(error=None)
+            return jsonify(error="Incorrect User")
+        return jsonify(error="Logged out")
+
+
 @app.route('/add_post', methods=["POST"])
 def add_post():
     # Adding New Post
@@ -367,6 +386,37 @@ def add_post():
                 return jsonify(error="Either server is not connected. Contact owner.")
         else:
             return jsonify(error="Login First")
+
+
+@app.route('/edit_post/<int:post_id>', methods=["POST"])
+def edit_post_id(post_id):
+    if request.method == "POST":
+        post__ = db.session.query(Posts).filter(Posts.id == post_id).first()
+        # Getting values from form
+        title__ = request.form["title"]
+        subtitle__ = request.form["subtitle"]
+        description__ = request.form["description"]
+        content__ = request.form["content"]
+        if post__ is not None:
+            user = db.session.query(Users).filter(Users.email == post__.email).first()
+            if "user" in session:
+                if post__.email == session["user"]:
+                    # Edit post here
+                    db.session.query(Posts).filter(Posts.id == post_id).update({
+                        Posts.title: title__,
+                        Posts.subtitle: subtitle__,
+                        Posts.description: description__,
+                        Posts.content: content__,
+                        Posts.time_upload: datetime.datetime.today().strftime("%b %d, %Y"),
+                        Posts.updated: True
+                    })
+                    db.session.commit()
+                    return jsonify(error=None)
+                else:
+                    return redirect('/')
+            else:
+                return redirect('/')
+        return redirect('/')
 
 
 @app.route('/about')
@@ -397,21 +447,38 @@ def posts():
 @app.route('/post/<int:post_id>')
 def post(post_id):
     post__ = db.session.query(Posts).filter(Posts.id == post_id).first()
-    user = db.session.query(Users).filter(Users.email == post__.email).first()
-    posts__ = db.session.query(Posts).filter(Posts.email == post__.email).all()
-    cur_ind = posts__.index(post__)
-    prev_post__ = None if cur_ind == 0 else posts__[cur_ind - 1]
-    next_post__ = None if cur_ind == len(posts__) - 1 else posts__[cur_ind + 1]
-    if "user" in session:
-        if post__.email == session["user"]:
-            return render_template("post.html", admin=user, user=user, params=data["params"],
-                                   post=post__, prevPost=prev_post__, nextPost=next_post__)
+    if post__ is not None:
+        user = db.session.query(Users).filter(Users.email == post__.email).first()
+        posts__ = db.session.query(Posts).filter(Posts.email == post__.email).all()
+        cur_ind = posts__.index(post__)
+        prev_post__ = None if cur_ind == 0 else posts__[cur_ind - 1]
+        next_post__ = None if cur_ind == len(posts__) - 1 else posts__[cur_ind + 1]
+        if "user" in session:
+            if post__.email == session["user"]:
+                return render_template("post.html", admin=user, user=user, params=data["params"],
+                                       post=post__, prevPost=prev_post__, nextPost=next_post__)
+            else:
+                return render_template("post.html", admin=None, user=user, params=data["params"],
+                                       post=post__, prevPost=prev_post__, nextPost=next_post__)
         else:
             return render_template("post.html", admin=None, user=user, params=data["params"],
                                    post=post__, prevPost=prev_post__, nextPost=next_post__)
-    else:
-        return render_template("post.html", admin=None, user=user, params=data["params"],
-                               post=post__, prevPost=prev_post__, nextPost=next_post__)
+    return redirect('/')
+
+
+@app.route('/post/<int:post_id>/edit')
+def post_edit(post_id):
+    post__ = db.session.query(Posts).filter(Posts.id == post_id).first()
+    if post__ is not None:
+        user = db.session.query(Users).filter(Users.email == post__.email).first()
+        if "user" in session:
+            if post__.email == session["user"]:
+                return render_template("edit_post.html", user=user, post=post__)
+            else:
+                return redirect('/')
+        else:
+            return redirect('/')
+    return redirect('/')
 
 
 @app.route('/add')

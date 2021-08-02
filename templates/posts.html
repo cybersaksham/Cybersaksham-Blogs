@@ -32,7 +32,11 @@
                     <a href="post/{{ post.id | safe }}" class="btn btn-primary">View</a>
                 </div>
                 <div class="card-footer">
+                    {% if post.updated == False %}
                     <small class="text-muted">Posted on {{ post.time_upload | safe }}</small>
+                    {% else %}
+                    <small class="text-muted">Updated on {{ post.time_upload | safe }}</small>
+                    {% endif %}
                 </div>
             </div>
         </div>

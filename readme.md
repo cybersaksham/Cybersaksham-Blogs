@@ -27,4 +27,4 @@ These python packages are used to made this website (also stored in requirements
 </ul>
 
 # Status
-<p>Now you can add post and view it but cannot edit & delete.</p>
+<p>Now you can do anything with your post but some functionalities for your audience is left.</p>

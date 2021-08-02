@@ -2,6 +2,8 @@
 {% block description %}{{ post.title | safe }} - {{ post.description | safe }} - Cybersaksham Blogs{% endblock %}
 {% block title %}{{ post.title | safe }}{% endblock %}
 {% block body %}
+<link href="/static/settings/style.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <!-- Page Header-->
 <header class="masthead" style="background-image: url('/static/assets/img/post-bg.jpg')">
     <div class="container position-relative px-4 px-lg-5">
@@ -11,19 +13,41 @@
                     <h1>{{ post.title | safe }}</h1>
                     <h2 class="subheading">{{ post.subtitle | safe }}</h2>
                     <span class="meta">
-                                Posted by
+                        {% if post.updated == False %}
+                        Posted by
+                        {% else %}
+                        Updated by
+                        {% endif %}
                         {% if admin == None %}
-                                <a href="#!">{{ user.fname | safe }}</a>
+                        <a href="#!">{{ user.fname | safe }}</a>
                         {% else %}
                         <a href="/">You</a>
                         {% endif %}
-                                on {{ post.time_upload | safe }}
-                            </span>
+                        on {{ post.time_upload | safe }}
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 </header>
+{% if admin != None %}
+<div class="container">
+    <div class="row justify-content-center mt-3">
+        <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" id="editPost" data-toggle="tab" href="#edit" role="tab"
+                       aria-controls="edit" aria-selected="false">Edit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="deletePost" data-toggle="tab" href="#delete" role="tab"
+                       aria-controls="delete" aria-selected="false">Delete</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
 <!-- Post Content-->
 <article class="mb-4">
     <div class="container px-4 px-lg-5">
@@ -47,4 +71,9 @@
     <a href="/post/{{ nextPost.id | safe }}" class="btn btn-primary">Next</a>
     {% endif %}
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script src="/static/posts/script.js"></script>
 {% endblock %}
