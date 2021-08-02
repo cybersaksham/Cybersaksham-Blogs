@@ -27,6 +27,10 @@ $(function(){
         $('#social').hide();
         $('#privacy').show();
     });
+    $('#cancel-tab').click(function(e){
+        e.preventDefault();
+        $(location).attr('href', '/settings');
+    });
 
     // Updating Profile Info
     $('#saveProfile').click(function(e){

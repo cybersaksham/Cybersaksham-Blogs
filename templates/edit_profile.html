@@ -22,6 +22,7 @@
                         <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab"
                            aria-controls="home" aria-selected="false">Info</a>
                     </li>
+                    {% if user.complete == True %}
                     <li class="nav-item">
                         <a class="nav-link" id="social-tab" data-toggle="tab" href="#social" role="tab"
                            aria-controls="home" aria-selected="false">Social</a>
@@ -30,6 +31,11 @@
                         <a class="nav-link" id="privacy-tab" data-toggle="tab" href="#privacy" role="tab"
                            aria-controls="home" aria-selected="false">Privacy</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="cancel-tab" data-toggle="tab" href="#cancel" role="tab"
+                           aria-controls="cancel" aria-selected="false">Cancel</a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <form id="profileForm">
                     <section id="info">

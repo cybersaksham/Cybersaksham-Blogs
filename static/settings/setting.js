@@ -42,4 +42,7 @@ $(function(){
         e.preventDefault();
         $(location).attr('href', '/')
     });
+
+    // Adding url in url_nonLogin field
+    $('#url_nonLogin').val(window.location.origin + '/' + $('#url_nonLogin').val() + '/about');
 });

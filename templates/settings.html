@@ -75,6 +75,11 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label for="url_nonLogin">Url for audience</label>
+                            <input readonly type="text" class="form-control" value="{{ user.id | safe}}"
+                                   id="url_nonLogin" name="url_nonLogin"/>
+                        </div>
+                        <div class="form-group">
                             <label for="email">Email</label>
                             <input readonly type="email" class="form-control" id="email" value="{{ user.email }}"
                                    placeholder="Enter your email" name="email"/>

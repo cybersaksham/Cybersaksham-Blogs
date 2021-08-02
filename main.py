@@ -20,6 +20,9 @@ else:
 db = SQLAlchemy(app)
 
 
+# ---------------- TABLES START ----------------
+
+
 # Users Table
 class Users(db.Model):
     __tablename__ = "users"
@@ -73,9 +76,15 @@ class Posts(db.Model):
         self.updated = updated
 
 
+# ---------------- TABLES END ----------------
+
+
 # Owner Region (used to send otp by website owner's email)
 email_ = db.session.query(Users).filter(Users.email == data["params"]["owner_email"]).first().email
 password_ = db.session.query(Users).filter(Users.email == data["params"]["owner_email"]).first().password
+
+
+# ---------------- MAIN ROUTE START ----------------
 
 
 @app.route('/')
@@ -91,6 +100,12 @@ def home():
     else:
         # If not logged in
         return render_template("login.html")
+
+
+# ---------------- MAIN ROUTE END ----------------
+
+
+# ---------------- FUNCTIONALITIES START ----------------
 
 
 def add_user(email):
@@ -243,6 +258,42 @@ def send_otp():
     session["otp"] = response.json()["otp"]
     session["email_otp"] = email
     return jsonify(response=response.json())
+
+
+@app.route('/send_email', methods=["POST"])
+def send_email():
+    import requests
+    # Sending email
+    if request.method == "POST":
+        # Getting data from form
+        to_email = request.form["to_email"]
+        name__ = request.form["name"]
+        email__ = request.form["email"]
+        phone__ = request.form["phone"]
+        msg__ = request.form["message"]
+
+        admin_msg = f"<p>Someone tried to contact you in blog website.</p>" \
+                    f"<p>Name = {name__}</p>" \
+                    f"<p>Email = {email__}</p>" \
+                    f"<p>Phone = {phone__}</p>" \
+                    f"<p>Message = \"{msg__}\"</p>" \
+                    f"<p>Contact back as soon as possible</p>."
+        user_msg = f"<p>Your message is successfully sent.</p>" \
+                   f"<p>You will be contacted back soon.</p>"
+
+        # Sending to website / blog owner
+        response1 = requests.post(
+            url=f"https://cybersaksham-apis.herokuapp.com/email?from={email_}&to={to_email}&password={password_}"
+                f"&subject=Cybersaksham-Blogs&message={admin_msg}"
+        )
+
+        # Sending to user
+        response2 = requests.post(
+            url=f"https://cybersaksham-apis.herokuapp.com/email?from={email_}&to={email__}&password={password_}"
+                f"&subject=Cybersaksham-Blogs&message={user_msg}"
+        )
+
+        return jsonify(error=None)
 
 
 @app.route('/update_profile', methods=["POST"])
@@ -419,12 +470,18 @@ def edit_post_id(post_id):
         return redirect('/')
 
 
+# ---------------- FUNCTIONALITIES END ----------------
+
+
+# ---------------- LOGIN ROUTES START ----------------
+
+
 @app.route('/about')
 def about():
     if "user" in session:
         user = db.session.query(Users).filter(Users.email == session["user"]).first()
         if user.complete:
-            return render_template("about.html", user=user, params=data["params"])
+            return render_template("about.html", user=user, params=data["params"], login=True)
         else:
             return redirect('/')
     else:
@@ -437,7 +494,8 @@ def posts():
         user = db.session.query(Users).filter(Users.email == session["user"]).first()
         if user.complete:
             posts__ = db.session.query(Posts).filter(Posts.email == session["user"]).all()
-            return render_template("posts.html", user=user, params=data["params"], posts=posts__, total=len(posts__))
+            return render_template("posts.html", user=user, params=data["params"], posts=posts__, total=len(posts__),
+                                   login=True)
         else:
             return redirect('/')
     else:
@@ -455,13 +513,13 @@ def post(post_id):
         next_post__ = None if cur_ind == len(posts__) - 1 else posts__[cur_ind + 1]
         if "user" in session:
             if post__.email == session["user"]:
-                return render_template("post.html", admin=user, user=user, params=data["params"],
+                return render_template("post.html", login=True, user=user, params=data["params"],
                                        post=post__, prevPost=prev_post__, nextPost=next_post__)
             else:
-                return render_template("post.html", admin=None, user=user, params=data["params"],
+                return render_template("post.html", login=False, user=user, params=data["params"],
                                        post=post__, prevPost=prev_post__, nextPost=next_post__)
         else:
-            return render_template("post.html", admin=None, user=user, params=data["params"],
+            return render_template("post.html", login=False, user=user, params=data["params"],
                                    post=post__, prevPost=prev_post__, nextPost=next_post__)
     return redirect('/')
 
@@ -512,6 +570,57 @@ def edit():
         return render_template("edit_profile.html", user=user)
     else:
         return redirect('/')
+
+
+# ---------------- LOGIN ROUTES END ----------------
+
+
+# ---------------- NON-LOGIN ROUTES START ----------------
+
+
+@app.route('/<int:user_id>/about')
+def about_nonLogin(user_id):
+    user = db.session.query(Users).filter(Users.id == user_id).first()
+    if user is not None and user.complete:
+        if "user" in session:
+            me = db.session.query(Users).filter(Users.email == session["user"]).first()
+            if user.id == me.id:
+                return redirect('/')
+            return render_template("about.html", user=user, params=data["params"], login=False)
+        return render_template("about.html", user=user, params=data["params"], login=False)
+    return redirect('/')
+
+
+@app.route('/<int:user_id>/posts')
+def posts_nonLogin(user_id):
+    user = db.session.query(Users).filter(Users.id == user_id).first()
+    if user is not None and user.complete:
+        posts__ = db.session.query(Posts).filter(Posts.email == user.email).all()
+        if "user" in session:
+            me = db.session.query(Users).filter(Users.email == session["user"]).first()
+            if user.id == me.id:
+                return redirect('/posts')
+            return render_template("posts.html", user=user, params=data["params"], posts=posts__, total=len(posts__),
+                                   login=False)
+        return render_template("posts.html", user=user, params=data["params"], posts=posts__, total=len(posts__),
+                               login=False)
+    return redirect('/')
+
+
+@app.route('/<int:user_id>/contact')
+def contact(user_id):
+    user = db.session.query(Users).filter(Users.id == user_id).first()
+    if user is not None and user.complete:
+        if "user" in session:
+            me = db.session.query(Users).filter(Users.email == session["user"]).first()
+            if user.id == me.id:
+                return redirect('/')
+            return render_template("contact.html", user=user, params=data["params"], login=False)
+        return render_template("contact.html", user=user, params=data["params"], login=False)
+    return redirect('/')
+
+
+# ---------------- NON-LOGIN ROUTES END ----------------
 
 
 if __name__ == '__main__':
