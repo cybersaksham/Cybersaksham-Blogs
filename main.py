@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, jsonify, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 import json
 import datetime
+import os
 
 # Loading variable configurations
 with open("config.json") as f:
@@ -16,7 +17,7 @@ app.secret_key = data["params"]["SECRET_KEY"]
 if data["params"]["debug"]:
     app.config['SQLALCHEMY_DATABASE_URI'] = data["params"]["local_database_uri"]
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = data["params"]["production_database_uri"]
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_URI', None)
 db = SQLAlchemy(app)
 
 
@@ -80,8 +81,8 @@ class Posts(db.Model):
 
 
 # Owner Region (used to send otp by website owner's email)
-email_ = db.session.query(Users).filter(Users.email == data["params"]["owner_email"]).first().email
-password_ = db.session.query(Users).filter(Users.email == data["params"]["owner_email"]).first().password
+email_ = data["params"]["owner_email"]
+password_ = os.environ.get('OWNER_PASSWORD', None)
 
 
 # ---------------- MAIN ROUTE START ----------------
