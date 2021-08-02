@@ -60,7 +60,7 @@ class Posts(db.Model):
     subtitle = db.Column(db.String(30), nullable=False)
     description = db.Column(db.String(50), nullable=False)
     content = db.Column(db.String(500), nullable=False)
-    time_upload = db.Column(db.DateTime(30), nullable=False)
+    time_upload = db.Column(db.String(15), nullable=False)
 
     def __init__(self, email, title, subtitle, description, content):
         self.email = email
@@ -68,7 +68,7 @@ class Posts(db.Model):
         self.subtitle = subtitle
         self.description = description
         self.content = content
-        self.time_upload = datetime.datetime.now()
+        self.time_upload = datetime.datetime.today().strftime("%b %d, %Y")
 
 
 # Owner Region (used to send otp by website owner's email)
@@ -146,10 +146,9 @@ def register_user():
                         db.session.commit()
                         add_user(email)
                         return jsonify(error=None)
-                    except Exception as e:
+                    except:
                         # If user is already present
-                        # return jsonify(error="Already Registered")
-                        return jsonify(error=e)
+                        return jsonify(error="Already Registered")
                     finally:
                         # In both cases clearing otp
                         session.pop("otp")
@@ -345,6 +344,31 @@ def update_password():
             return jsonify(error="Complete info first")
 
 
+@app.route('/add_post', methods=["POST"])
+def add_post():
+    # Adding New Post
+    if request.method == "POST":
+        # Getting values from form
+        title__ = request.form["title"]
+        subtitle__ = request.form["subtitle"]
+        description__ = request.form["description"]
+        content__ = request.form["content"]
+
+        # Checking for logged in or not
+        if "user" in session:
+            try:
+                # Try to add post in database
+                post = Posts(session["user"], title__, subtitle__, description__, content__)
+                db.session.add(post)
+                db.session.commit()
+                return jsonify(error=None)
+            except:
+                # If some problem occurred
+                return jsonify(error="Either server is not connected. Contact owner.")
+        else:
+            return jsonify(error="Login First")
+
+
 @app.route('/about')
 def about():
     if "user" in session:
@@ -359,12 +383,23 @@ def about():
 
 @app.route('/posts')
 def posts():
-    a = datetime.datetime.today().strftime("%b %d, %Y")
     if "user" in session:
         user = db.session.query(Users).filter(Users.email == session["user"]).first()
         if user.complete:
             posts__ = db.session.query(Posts).filter(Posts.email == session["user"]).all()
-            return render_template("posts.html", user=user, params=data["params"], posts=posts__)
+            return render_template("posts.html", user=user, params=data["params"], posts=posts__, total=len(posts__))
+        else:
+            return redirect('/')
+    else:
+        return redirect('/')
+
+
+@app.route('/add')
+def add():
+    if "user" in session:
+        user = db.session.query(Users).filter(Users.email == session["user"]).first()
+        if user.complete:
+            return render_template("add_post.html", user=user)
         else:
             return redirect('/')
     else:
