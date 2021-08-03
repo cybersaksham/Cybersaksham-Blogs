@@ -32,4 +32,17 @@ $(function(){
             $(location).attr('href', window.location.href)
         }
 	});
+
+	// Pressing copy post url button
+	$('#copyPost').click(function(e){
+	    e.preventDefault();
+	    $temp = $("<input>");
+	    $url = window.location.href;
+	    $("body").append($temp);
+	    $temp.val($url).select();
+	    document.execCommand("copy");
+	    $temp.remove();
+	    alert("Copied url : " + $url);
+	    $(location).attr('href', window.location.href)
+	});
 });

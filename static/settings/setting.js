@@ -47,4 +47,17 @@ $(function(){
 
     // Adding url in url_nonLogin field
     $('#url_nonLogin').val(window.location.origin + '/' + $('#url_nonLogin').val() + '/about');
+
+	// Pressing copy profile url button
+	$('#copyUrl').click(function(e){
+	    e.preventDefault();
+	    $temp = $("<input>");
+	    $url = $('#url_nonLogin').val();
+	    $("body").append($temp);
+	    $temp.val($url).select();
+	    document.execCommand("copy");
+	    $temp.remove();
+	    alert("Copied url : " + $url);
+	    $(location).attr('href', window.location.href)
+	});
 });
