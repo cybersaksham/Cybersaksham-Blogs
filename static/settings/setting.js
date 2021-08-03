@@ -6,7 +6,7 @@ $(function(){
     });
     $('#delete-tab').click(function(e){
         e.preventDefault();
-        if (confirm("Do you really want to delete account permanently")){
+        if (confirm("Do you really want to delete account & posts permanently")){
             // Sending request to delete user
             $.ajax({
                 url: '/delete_user',

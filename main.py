@@ -242,6 +242,9 @@ def delete_user():
             # Finding user by email
             user = db.session.query(Users).filter(Users.email == session["user"]).first()
             db.session.delete(user)
+            posts__ = db.session.query(Posts).filter(Posts.email == session["user"]).all()
+            for post__ in posts__:
+                db.session.delete(post__)
             db.session.commit()
             session.pop("user")
             return jsonify(error=None)
