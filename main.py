@@ -93,11 +93,13 @@ def home():
     if 'user' in session:
         # If already logged in
         user = db.session.query(Users).filter(Users.email == session["user"]).first()
-        # Checking if profile of user is complete
-        if user.complete:
-            return redirect('/about')
-        else:
-            return redirect("/edit")
+        if user is not None:
+            # Checking if profile of user is complete
+            if user.complete:
+                return redirect('/about')
+            else:
+                return redirect("/edit")
+        return render_template("login.html")
     else:
         # If not logged in
         return render_template("login.html")

@@ -36,6 +36,11 @@
                         <a class="nav-link" id="cancel-tab" data-toggle="tab" href="#cancel" role="tab"
                            aria-controls="cancel" aria-selected="false">Cancel</a>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout-tab" data-toggle="tab" href="#logout" role="tab"
+                           aria-controls="logout" aria-selected="false">Logout</a>
+                    </li>
                     {% endif %}
                 </ul>
                 <form id="profileForm">

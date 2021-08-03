@@ -31,6 +31,20 @@ $(function(){
         e.preventDefault();
         $(location).attr('href', '/settings');
     });
+    $('#logout-tab').click(function(e){
+        e.preventDefault();
+        if (confirm("Do you really want to logout")){
+            // Sending request to logout user
+            $.ajax({
+                url: '/logout_user',
+                type: 'POST'
+            });
+            $(location).attr('href', '/')
+        }
+        else{
+            $(location).attr('href', '/')
+        }
+    });
 
     // Updating Profile Info
     $('#saveProfile').click(function(e){
