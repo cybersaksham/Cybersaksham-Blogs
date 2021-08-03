@@ -82,7 +82,7 @@ $(function(){
                     }
                     else {
                         // If no error then goto home page
-                        $(location).attr('href', '/')
+                        $(location).attr('href', '/settings')
                     }
                 },
                 error: function(error){
@@ -117,7 +117,7 @@ $(function(){
                     }
                     else {
                         // If no error then goto home page
-                        $(location).attr('href', '/')
+                        $(location).attr('href', '/settings')
                     }
                 },
                 error: function(error){
@@ -155,7 +155,7 @@ $(function(){
                     }
                     else {
                         // If no error then goto home page
-                        $(location).attr('href', '/')
+                        $(location).attr('href', '/settings')
                     }
                 },
                 error: function(error){
