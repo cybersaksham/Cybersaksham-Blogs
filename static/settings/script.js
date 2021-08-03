@@ -37,9 +37,11 @@ $(function(){
             // Sending request to logout user
             $.ajax({
                 url: '/logout_user',
-                type: 'POST'
+                type: 'POST',
+                success: function(response){
+                    $(location).attr('href', '/')
+                },
             });
-            $(location).attr('href', '/')
         }
         else{
             $(location).attr('href', '/')
