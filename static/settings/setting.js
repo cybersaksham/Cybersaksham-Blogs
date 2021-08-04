@@ -20,9 +20,6 @@ $(function(){
                 }
             });
         }
-        else{
-            $(location).attr('href', '/settings')
-        }
     });
     $('#logout-tab').click(function(e){
         e.preventDefault();
@@ -35,9 +32,6 @@ $(function(){
                     $(location).attr('href', '/')
                 },
             });
-        }
-        else{
-            $(location).attr('href', '/settings')
         }
     });
     $('#home-tab').click(function(e){

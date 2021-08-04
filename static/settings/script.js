@@ -43,9 +43,6 @@ $(function(){
                 },
             });
         }
-        else{
-            $(location).attr('href', '/')
-        }
     });
 
     // Updating Profile Info

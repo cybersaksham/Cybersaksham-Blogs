@@ -28,9 +28,6 @@ $(function(){
                 }
             });
         }
-        else{
-            $(location).attr('href', window.location.href)
-        }
 	});
 
 	// Pressing copy post url button
@@ -43,6 +40,5 @@ $(function(){
 	    document.execCommand("copy");
 	    $temp.remove();
 	    alert("Copied url : " + $url);
-	    $(location).attr('href', window.location.href)
 	});
 });
